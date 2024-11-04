@@ -1,8 +1,10 @@
 from datetime import datetime
 from typing import List
-from openai import BaseModel
 
-class Notice(BaseModel):
+from pydantic import BaseModel
+
+
+class NoticeModel(BaseModel):
     """A tender notice published on a procurement portal.
     
     Represents a public procurement notice containing details about
@@ -36,3 +38,13 @@ class Notice(BaseModel):
 
     submission_deadline: datetime
     """Date and time for the deadline for submitting tender proposals."""
+
+
+class CategoryModel(BaseModel):
+    category_id: int
+    category_name: str
+
+
+class NoticeCategoryModel(BaseModel):
+    notice_id: int
+    category_id: int

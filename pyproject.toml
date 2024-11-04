@@ -12,7 +12,10 @@ packages = [
 python = "^3.10"
 pydantic = "^2.9.2"
 pytest = "^8.3.3"
-
+SQLAlchemy = "^2.0.36"
+openai = "^1.53.0"
+fastapi = "^0.115.4"
+python-dotenv = "^1.0.1"
 
 [build-system]
 requires = ["poetry-core"]

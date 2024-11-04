@@ -1,0 +1,26 @@
+[
+  {
+    "title": "Supply and Installation of Solar Panels for Municipal Buildings",
+    "description": "Seeking qualified contractors to supply and install photovoltaic solar panels on multiple municipal buildings to enhance renewable energy usage and reduce carbon footprint. The project includes maintenance services for a period of 5 years.",
+    "location": "Munich, Germany",
+    "buyer": "Munich City Council",
+    "volume": 300000,
+    "cpv_codes": [
+      "09330000-1"
+    ],
+    "publication_deadline": "2024-11-15T00:00:00",
+    "submission_deadline": "2025-01-31T00:00:00"
+  },
+  {
+    "title": "Construction of New Public Library Facility",
+    "description": "Invitation to tender for the construction of a modern public library, including architectural design, civil engineering, and interior fit-out. The building should meet green building standards and be accessible to all citizens.",
+    "location": "Dublin, Ireland",
+    "buyer": "Dublin Public Works Department",
+    "volume": 2000000,
+    "cpv_codes": [
+      "45212300-9"
+    ],
+    "publication_deadline": "2024-12-01T00:00:00",
+    "submission_deadline": "2025-03-15T00:00:00"
+  }
+]
