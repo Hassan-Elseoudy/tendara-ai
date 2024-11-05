@@ -3,6 +3,8 @@ from typing import List
 
 from pydantic import BaseModel
 
+from tendara_ai_challenge.matching.entity import Notice
+
 
 class NoticeModel(BaseModel):
     """A tender notice published on a procurement portal.
@@ -17,6 +19,7 @@ class NoticeModel(BaseModel):
     description: str
     """Detailed description of the tender requirements and scope."""
 
+    # TODO: Later on we may support geo location coordinated, or adding regions? Not only strings.
     location: str
     """Geographic location where services will be provided (country/city)."""
 
@@ -40,11 +43,16 @@ class NoticeModel(BaseModel):
     """Date and time for the deadline for submitting tender proposals."""
 
 
-class CategoryModel(BaseModel):
-    category_id: int
-    category_name: str
+# TODO: Later on we can provide a feedback model
+# class FeedbackModel(BaseModel):
+#     feedback_id: int
+#     profile_id: int
+#     notice: NoticeModel
+#     feedback_rating: int
+#     feedback_text: str
 
+class MatchingNoticesResponse(BaseModel):
+    notice: Notice
 
-class NoticeCategoryModel(BaseModel):
-    notice_id: int
-    category_id: int
+    # TODO: Later on we can add a match score to the response and present it to the user?
+    match_score: float = 0.0
