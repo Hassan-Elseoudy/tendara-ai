@@ -3,9 +3,10 @@ from datetime import datetime
 from pathlib import Path
 from typing import List
 
-from tendara_ai_challenge.matching.models import Notice
+from tendara_ai_challenge.matching.dto import NoticeModel
 
-def load_notices() -> List[Notice]:
+
+def load_notices() -> List[NoticeModel]:
     """
     Loads tender notices from the test_notices.json file and converts them to Notice objects.
     
@@ -22,12 +23,12 @@ def load_notices() -> List[Notice]:
         notice_data["publication_deadline"] = datetime.fromisoformat(notice_data["publication_deadline"])
         notice_data["submission_deadline"] = datetime.fromisoformat(notice_data["submission_deadline"])
         
-        notice = Notice(**notice_data)
+        notice = NoticeModel(**notice_data)
         notices.append(notice)
     
     return notices
 
-def pretty_print_notices(notices: List[Notice]) -> None:
+def pretty_print_notices(notices: List[NoticeModel]) -> None:
     """
     Pretty prints a list of notices in a readable format.
     
