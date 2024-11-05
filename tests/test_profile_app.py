@@ -32,20 +32,20 @@ def test_create_profile_should_return_profile(client: TestClient):
     profile = {
         "location_id": 1,
         "category_id": 1,
-        "tag_ids": [1, 2, 3],
+        "tags": ["1", "2", "3"],
     }
     response = client.post("/profiles", json=profile)
     assert response.status_code == 200
     assert response.json()["location_id"] == profile["location_id"]
     assert response.json()["category_id"] == profile["category_id"]
-    assert response.json()["tags"] == profile["tag_ids"]
+    assert response.json()["tags"] == profile["tags"]
 
 
 def test_read_profile_should_return_profile(client: TestClient, session: Session):
     profile = {
         "location_id": 1,
         "category_id": 1,
-        "tag_ids": [1, 2, 3],
+        "tags": ["1", "2", "3"],
     }
     response = client.post("/profiles", json=profile)
     profile_id = response.json()["id"]
@@ -54,7 +54,7 @@ def test_read_profile_should_return_profile(client: TestClient, session: Session
     assert response.status_code == 200
     assert response.json()["location_id"] == profile["location_id"]
     assert response.json()["category_id"] == profile["category_id"]
-    assert response.json()["tags"] == profile["tag_ids"]
+    assert response.json()["tags"] == profile["tags"]
 
 
 def test_read_profile_should_return_404_when_profile_not_found(client: TestClient):
@@ -67,7 +67,7 @@ def test_delete_profile_should_return_200(client: TestClient, session: Session):
     profile = {
         "location_id": 1,
         "category_id": 1,
-        "tag_ids": [1, 2, 3],
+        "tags": ["1", "2", "3"],
     }
     response = client.post("/profiles", json=profile)
     profile_id = response.json()["id"]

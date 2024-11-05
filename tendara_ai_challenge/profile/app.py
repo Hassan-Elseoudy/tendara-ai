@@ -19,7 +19,7 @@ async def create_profile(*, session: Session = Depends(get_session), profile: Se
     db_profile = Profile(
         location_id=profile.location_id,
         category_id=profile.category_id,
-        tag_ids=",".join(map(str, profile.tag_ids)),
+        tags=",".join(map(str, profile.tags)),
         # TODO: Add publication_deadline to the Profile object.
         publication_deadline=datetime.max
     )
@@ -32,7 +32,7 @@ async def create_profile(*, session: Session = Depends(get_session), profile: Se
         "id": db_profile.id,
         "category_id": db_profile.category_id,
         "location_id": db_profile.location_id,
-        "tags": list(map(int, db_profile.tag_ids.split(","))),
+        "tags": list(map(str, db_profile.tags.split(","))),
         "publication_deadline": db_profile.publication_deadline
     }
 
@@ -51,7 +51,7 @@ async def get_profile(id: int, session: Session = Depends(get_session)):
         "id": profile.id,
         "category_id": profile.category_id,
         "location_id": profile.location_id,
-        "tags": list(map(int, profile.tag_ids.split(","))),
+        "tags": list(map(str, profile.tags.split(","))),
         "publication_deadline": profile.publication_deadline
     }
 

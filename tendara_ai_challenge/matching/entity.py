@@ -5,10 +5,9 @@ from sqlmodel import Field, Relationship, SQLModel, create_engine, Session
 
 
 class Notice(SQLModel, table=True):
-    id: Optional[int] = Field(default=None, primary_key=True)
+    id: int = Field(default=None, primary_key=True)
     title: Optional[str] = Field(default=None)
     description: Optional[str] = Field(default=None)
-    location: Optional[str] = Field(default=None)
     buyer: Optional[str] = Field(default=None)
     volume: Optional[int] = Field(default=None)
     publication_deadline: Optional[date] = Field(default=None)
@@ -20,7 +19,7 @@ class Notice(SQLModel, table=True):
     def __repr__(self):
         return (
             f"<Notice(title={self.title}, description={self.description}, "
-            f"location={self.location}, buyer={self.buyer}, volume={self.volume}, "
+            f"buyer={self.buyer}, volume={self.volume}, "
             f"publication_deadline={self.publication_deadline}, submission_deadline={self.submission_deadline})>"
         )
 
@@ -50,7 +49,7 @@ class Profile(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     category_id: Optional[int] = Field(default=None)
     location_id: Optional[int] = Field(default=None)
-    tag_ids: Optional[str] = Field(default=None)  # TODO: A better way to store tag_ids.
+    tags: Optional[str] = Field(default=None)  # TODO: A better way to store tags.
     publication_deadline: Optional[date] = Field(default=None)  # TODO: Really use publication_deadline
 
     # feedbacks: List["Feedback"] = Relationship(back_populates="profile")
@@ -81,8 +80,8 @@ class Profile(SQLModel, table=True):
 
 class NoticeCategory(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
-    notice_id: Optional[int] = Field(default=None, foreign_key="notice.id")
-    category_id: Optional[int] = Field(default=None, foreign_key="category.id")
+    notice_id: int = Field(default=None, foreign_key="notice.id")
+    category_id: int = Field(default=None, foreign_key="category.id")
 
     notice: "Notice" = Relationship(back_populates="categories")
     category: "Category" = Relationship(back_populates="notices")

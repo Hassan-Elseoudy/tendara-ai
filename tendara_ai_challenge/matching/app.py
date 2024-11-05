@@ -16,4 +16,4 @@ async def get_matches(profile_id: int, db: Session = Depends(get_session)):
         raise HTTPException(status_code=404, detail="User not found")
 
     matching_notices = find_relevant_notices(profile, db)
-    return {"matches": [notice.to_dict() for notice in matching_notices]}
+    return MatchingNoticesResponse(notices=matching_notices)

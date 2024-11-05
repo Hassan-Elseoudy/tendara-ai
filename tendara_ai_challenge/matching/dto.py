@@ -52,7 +52,7 @@ class NoticeModel(BaseModel):
 #     feedback_text: str
 
 class MatchingNoticesResponse(BaseModel):
-    notice: Notice
+    notices: List[Notice]
 
     # TODO: Later on we can add a match score to the response and present it to the user?
-    match_score: float = 0.0
+    # match_score: float = 0.0
