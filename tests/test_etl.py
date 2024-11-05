@@ -1,10 +1,21 @@
-from sqlalchemy import create_engine, text
-from sqlalchemy.orm import sessionmaker
+import pytest
+from sqlalchemy import create_engine, text, StaticPool
+from sqlmodel import SQLModel, Session
 
 from tendara_ai_challenge.etl.extractor import JSONDataExtractStrategy, DataExtractService
 from tendara_ai_challenge.etl.processor import DataProcessorService, OpenAIAnalyzer
 from tendara_ai_challenge.etl.transformer import JSONDataTransformStrategy, DataTransformService
-from tendara_ai_challenge.matching.alchemy import Base, NoticeCategory, NoticeLocation
+from tendara_ai_challenge.matching.alchemy import NoticeCategory, NoticeLocation
+
+
+@pytest.fixture(name="session")
+def session_fixture():
+    engine = create_engine(
+        "sqlite://", connect_args={"check_same_thread": False}, poolclass=StaticPool
+    )
+    SQLModel.metadata.create_all(engine)
+    with Session(engine) as session:
+        yield session
 
 
 def test_extractor_in_etl():
@@ -55,46 +66,38 @@ def test_transformer_in_etl():
     assert notices[1].cpv_codes == data[1]["cpv_codes"]
 
 
-def test_processor_in_etl():
-    # Create an in-memory SQLite database
-    engine = create_engine('sqlite:///:memory:', connect_args={'check_same_thread': False})
-    SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+def test_processor_in_etl(session: Session):
+    # Add data to the database Category table
+    session.exec(text("INSERT INTO category (id, name) VALUES (1, 'Construction')"))
+    session.exec(text("INSERT INTO category (id, name) VALUES (2, 'Solar Panels')"))
 
-    with SessionLocal() as db:
-        # Create all tables in the in-memory database
-        Base.metadata.create_all(engine)
+    # Add data to the database Location table
+    session.exec(text("INSERT INTO location (id, city, country) VALUES (1, 'Munich', 'Germany')"))
+    session.exec(text("INSERT INTO location (id, city, country) VALUES (2, 'Dublin', 'Ireland')"))
 
-        # Add data to the database Category table
-        db.execute(text("INSERT INTO category (id, name) VALUES (1, 'Construction')"))
-        db.execute(text("INSERT INTO category (id, name) VALUES (2, 'Solar Panels')"))
+    # Load data from a JSON file
+    data_path = "data/notices.json"
+    extract_service = DataExtractService(JSONDataExtractStrategy())
+    data = extract_service.load(data_path)
 
-        # Add data to the database Location table
-        db.execute(text("INSERT INTO location (id, city, country) VALUES (1, 'Munich', 'Germany')"))
-        db.execute(text("INSERT INTO location (id, city, country) VALUES (2, 'Dublin', 'Ireland')"))
+    transform_service = DataTransformService(JSONDataTransformStrategy())
+    notices = transform_service.transform_data(data)
 
-        # Load data from a JSON file
-        data_path = "data/notices.json"
-        extract_service = DataExtractService(JSONDataExtractStrategy())
-        data = extract_service.load(data_path)
+    # Initialize the data processor with the in-memory database session
+    data_processor = DataProcessorService(OpenAIAnalyzer(session))
+    data_processor.process(notices)
 
-        transform_service = DataTransformService(JSONDataTransformStrategy())
-        notices = transform_service.transform_data(data)
+    # Query the NoticeCategory table to check if the data was processed correctly
+    notice_categories = session.query(NoticeCategory).all()
 
-        # Initialize the data processor with the in-memory database session
-        data_processor = DataProcessorService(OpenAIAnalyzer(db))
-        data_processor.process(notices)
+    assert notice_categories[0].notice_id == 1
+    assert notice_categories[0].category_id == 2
 
-        # Query the NoticeCategory table to check if the data was processed correctly
-        notice_categories = db.query(NoticeCategory).all()
+    assert notice_categories[1].notice_id == 2
+    assert notice_categories[1].category_id == 1
 
-        assert notice_categories[0].notice_id == 1
-        assert notice_categories[0].category_id == 2
+    # Query the NoticeLocation table to check if the data was processed correctly
+    notice_locations = session.query(NoticeLocation).all()
 
-        assert notice_categories[1].notice_id == 2
-        assert notice_categories[1].category_id == 1
-
-        # Query the NoticeLocation table to check if the data was processed correctly
-        notice_locations = db.query(NoticeLocation).all()
-
-        assert notice_locations[0].notice_id == 1
-        assert notice_locations[0].location_id == 1
+    assert notice_locations[0].notice_id == 1
+    assert notice_locations[0].location_id == 1
