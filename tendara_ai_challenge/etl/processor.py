@@ -7,7 +7,7 @@ from dotenv import load_dotenv
 from openai import OpenAI
 
 from tendara_ai_challenge.etl.dto import RelatedIds
-from tendara_ai_challenge.matching.alchemy import Category, Notice, NoticeCategory, Location, NoticeLocation
+from tendara_ai_challenge.matching.entity import Category, Notice, NoticeCategory, Location, NoticeLocation
 from tendara_ai_challenge.matching.dto import NoticeModel
 
 load_dotenv()

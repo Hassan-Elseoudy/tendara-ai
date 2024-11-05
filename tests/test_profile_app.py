@@ -3,7 +3,7 @@ from fastapi.testclient import TestClient
 from sqlmodel import Session, SQLModel, create_engine
 from sqlmodel.pool import StaticPool
 
-from tendara_ai_challenge.matching.alchemy import get_session, Profile
+from tendara_ai_challenge.matching.entity import Profile, get_session
 from tendara_ai_challenge.profile.app import app
 
 

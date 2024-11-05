@@ -3,7 +3,7 @@ from datetime import datetime
 from fastapi import FastAPI, Depends, HTTPException
 from sqlalchemy.orm import Session
 
-from tendara_ai_challenge.matching.alchemy import Profile, create_db_and_tables, get_session
+from tendara_ai_challenge.matching.entity import Profile, create_db_and_tables, get_session
 from tendara_ai_challenge.profile.dto import SearchProfileRequestSchema, SearchProfileResponseSchema
 
 app = FastAPI()

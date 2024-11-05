@@ -5,7 +5,7 @@ from sqlmodel import SQLModel, Session
 from tendara_ai_challenge.etl.extractor import JSONDataExtractStrategy, DataExtractService
 from tendara_ai_challenge.etl.processor import DataProcessorService, OpenAIAnalyzer
 from tendara_ai_challenge.etl.transformer import JSONDataTransformStrategy, DataTransformService
-from tendara_ai_challenge.matching.alchemy import NoticeCategory, NoticeLocation
+from tendara_ai_challenge.matching.entity import NoticeCategory, NoticeLocation
 
 
 @pytest.fixture(name="session")
