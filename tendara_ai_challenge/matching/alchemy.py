@@ -1,79 +1,118 @@
-import json
+from datetime import date
+from typing import List, Optional
 
-from sqlalchemy import Column, Integer, String, ForeignKey, DATE
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import relationship
-
-Base = declarative_base()
+from sqlmodel import Field, Relationship, SQLModel, create_engine, Session
 
 
-class Notice(Base):
-    __tablename__ = 'notice'
+class Notice(SQLModel, table=True):
+    id: Optional[int] = Field(default=None, primary_key=True)
+    title: Optional[str] = Field(default=None)
+    description: Optional[str] = Field(default=None)
+    location: Optional[str] = Field(default=None)
+    buyer: Optional[str] = Field(default=None)
+    volume: Optional[int] = Field(default=None)
+    publication_deadline: Optional[date] = Field(default=None)
+    submission_deadline: Optional[date] = Field(default=None)
 
-    id = Column(Integer, primary_key=True)
-    title = Column(String)
-    description = Column(String)
-    location = Column(String)
-    buyer = Column(String)
-    volume = Column(Integer)
-    publication_deadline = Column(DATE)
-    submission_deadline = Column(DATE)
+    categories: List["NoticeCategory"] = Relationship(back_populates="notice")
+    locations: List["NoticeLocation"] = Relationship(back_populates="notice")
 
     def __repr__(self):
-        return f"<Notice(title={self.title}, description={self.description}, location={self.location}, buyer={self.buyer}, volume={self.volume}, publication_deadline={self.publication_deadline}, submission_deadline={self.submission_deadline})>"
+        return (
+            f"<Notice(title={self.title}, description={self.description}, "
+            f"location={self.location}, buyer={self.buyer}, volume={self.volume}, "
+            f"publication_deadline={self.publication_deadline}, submission_deadline={self.submission_deadline})>"
+        )
 
-    categories = relationship("NoticeCategory", back_populates="notice")
-    locations = relationship("NoticeLocation", back_populates="notice")
 
+class Category(SQLModel, table=True):
+    id: Optional[int] = Field(default=None, primary_key=True)
+    name: Optional[str] = Field(default=None)
 
-class Category(Base):
-    __tablename__ = 'category'
-
-    id = Column(Integer, primary_key=True)
-    name = Column(String)
+    notices: List["NoticeCategory"] = Relationship(back_populates="category")
 
     def __repr__(self):
-        return f"<({self.name}, {self.id})>"
-
-    notices = relationship("NoticeCategory", back_populates="category")
+        return f"<Category(name={self.name}, id={self.id})>"
 
 
-class Location(Base):
-    __tablename__ = 'location'
+class Location(SQLModel, table=True):
+    id: Optional[int] = Field(default=None, primary_key=True)
+    city: Optional[str] = Field(default=None)
+    country: Optional[str] = Field(default=None)
 
-    id = Column(Integer, primary_key=True)
-    city = Column(String)
-    country = Column(String)
+    notices: List["NoticeLocation"] = Relationship(back_populates="location")
 
     def __repr__(self):
         return f"<Location(city={self.city}, country={self.country})>"
 
-    notices = relationship("NoticeLocation", back_populates="location")
+
+class Profile(SQLModel, table=True):
+    id: Optional[int] = Field(default=None, primary_key=True)
+    category_id: Optional[int] = Field(default=None)
+    location_id: Optional[int] = Field(default=None)
+    tag_ids: Optional[str] = Field(default=None)  # TODO: A better way to store tag_ids.
+    publication_deadline: Optional[date] = Field(default=None)  # TODO: Really use publication_deadline
+
+    # feedbacks: List["Feedback"] = Relationship(back_populates="profile")
+
+    def __repr__(self):
+        return (
+            f"<Profile(id={self.id}, category_id={self.category_id}, "
+            f"location_id={self.location_id}, publication_deadline={self.publication_deadline})>"
+        )
 
 
-class NoticeCategory(Base):
-    __tablename__ = 'notice_category'
+# class Feedback(SQLModel, table=True):
+#     id: Optional[int] = Field(default=None, primary_key=True)
+#     profile_id: Optional[int] = Field(default=None, foreign_key="profile.id")
+#     notice_id: Optional[int] = Field(default=None, foreign_key="notice.id")
+#     feedback_rating: Optional[int] = Field(default=None)
+#     feedback_text: Optional[str] = Field(default=None)
+#
+#     profile: "Profile" = Relationship(back_populates="feedbacks")
+#     notice: "Notice" = Relationship(back_populates="feedbacks")
+#
+#     def __repr__(self):
+#         return (
+#             f"<Feedback(profile_id={self.profile_id}, notice_id={self.notice_id}, "
+#             f"feedback_rating={self.feedback_rating}, feedback_text={self.feedback_text})>"
+#         )
+#
 
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    notice_id = Column(Integer, ForeignKey('notice.id'))
-    category_id = Column(Integer, ForeignKey('category.id'))
+class NoticeCategory(SQLModel, table=True):
+    id: Optional[int] = Field(default=None, primary_key=True)
+    notice_id: Optional[int] = Field(default=None, foreign_key="notice.id")
+    category_id: Optional[int] = Field(default=None, foreign_key="category.id")
 
-    notice = relationship("Notice", back_populates="categories")
-    category = relationship("Category", back_populates="notices")
+    notice: "Notice" = Relationship(back_populates="categories")
+    category: "Category" = Relationship(back_populates="notices")
 
     def __repr__(self):
         return f"<NoticeCategory(notice_id={self.notice_id}, category_id={self.category_id})>"
 
 
-class NoticeLocation(Base):
-    __tablename__ = 'notice_location'
+class NoticeLocation(SQLModel, table=True):
+    id: Optional[int] = Field(default=None, primary_key=True)
+    notice_id: Optional[int] = Field(default=None, foreign_key="notice.id")
+    location_id: Optional[int] = Field(default=None, foreign_key="location.id")
 
-    id = Column(Integer, primary_key=True, autoincrement=True)  # Added primary key
-    notice_id = Column(Integer, ForeignKey('notice.id'))
-    location_id = Column(Integer, ForeignKey('location.id'))
-
-    notice = relationship("Notice", back_populates="locations")
-    location = relationship("Location", back_populates="notices")
+    notice: "Notice" = Relationship(back_populates="locations")
+    location: "Location" = Relationship(back_populates="notices")
 
     def __repr__(self):
         return f"<NoticeLocation(notice_id={self.notice_id}, location_id={self.location_id})>"
+
+
+sqlite_file_name = "database.db"
+sqlite_url = f"sqlite:///{sqlite_file_name}"
+
+engine = create_engine(sqlite_url, connect_args={"check_same_thread": False}, echo=True)
+
+
+def create_db_and_tables():
+    SQLModel.metadata.create_all(engine)
+
+
+def get_session():
+    with Session(engine) as session:
+        yield session
